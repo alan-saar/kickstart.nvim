@@ -172,6 +172,9 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', '<leader>]d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 
+-- Keymaps do NERDTree
+vim.keymap.set('n', '<leader>e', ':NERDTreeToggle<cr>', { desc = 'Go to next [D]iagnostic message' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
