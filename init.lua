@@ -84,6 +84,10 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- NOTE: desabilita o autoformat por padrão no buffer e globalmente
+vim.g.enable_autoformat = false
+vim.g.enable_autotrailing = true
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -241,6 +245,7 @@ require('lazy').setup({
   'vimwiki/vimwiki',
   'tpope/vim-vinegar',
   'scrooloose/nerdtree',
+  'rcarriga/nvim-notify',
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -470,6 +475,7 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'nvim-java/nvim-java',
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -625,6 +631,8 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
+        -- -- se descomentar abaixo ele instala automático. Mas estou instalando tudo pelo Mason (:LspInstall)
+        -- java_language_server = {},
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
@@ -680,6 +688,15 @@ require('lazy').setup({
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
+          jdtls = function()
+            require('java').setup {
+              -- Your custom jdtls settings goes here
+            }
+
+            require('lspconfig').jdtls.setup {
+              -- Your custom nvim-java configuration goes here
+            }
+          end,
         },
       }
     end,
@@ -702,6 +719,18 @@ require('lazy').setup({
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
+        -- Disable with a global or buffer-local variable
+        if not vim.g.enable_autoformat or not vim.b[bufnr].enable_autoformat then
+          -- se tiver só o autotrailing
+          if vim.g.enable_autotrailing or vim.b[bufnr].enable_autotrailing then
+            return {
+              timeout_ms = 500,
+              -- pelo que entendi o fallback que faz identar o código
+              lsp_format = 'never',
+            }
+          end
+          return
+        end
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
@@ -712,11 +741,32 @@ require('lazy').setup({
         else
           lsp_format_opt = 'fallback'
         end
+        -- comente a linha abaixo e descomente o if acima para habilitar o format_on_save
+        --lsp_format_opt = 'never'
         return {
           timeout_ms = 500,
           lsp_format = lsp_format_opt,
         }
       end,
+      -- format on save que veio com o kickstart
+      -- format_on_save = function(bufnr)
+      --   -- Disable "format_on_save lsp_fallback" for languages that don't
+      --   -- have a well standardized coding style. You can add additional
+      --   -- languages here or re-enable it for the disabled ones.
+      --   local disable_filetypes = { c = true, cpp = true }
+      --   local lsp_format_opt
+      --   if disable_filetypes[vim.bo[bufnr].filetype] then
+      --     lsp_format_opt = 'never'
+      --   else
+      --     lsp_format_opt = 'fallback'
+      --   end
+      --   -- comente a linha abaixo e descomente o if acima para habilitar o format_on_save
+      --   -- lsp_format_opt = 'never'
+      --   return {
+      --     timeout_ms = 500,
+      --     lsp_format = lsp_format_opt,
+      --   }
+      -- end,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -908,7 +958,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'java' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -978,3 +1028,48 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+-- cria uma variável global para desabilibar o o format on save
+vim.notify = require 'notify'
+vim.api.nvim_create_user_command('AutoFormatDisable', function(args)
+  if args.bang then
+    -- AutoFormatDisable! will disable formatting just for this buffer
+    vim.b.enable_autotrailing = false
+    vim.b.enable_autoformat = false
+    vim.notify('autoformat-on-save DESABILITADO no buffer', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  else
+    vim.g.enable_autotrailing = false
+    vim.g.enable_autoformat = false
+    vim.notify('autoformat-on-save DESABILITADO globalmente', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  end
+end, {
+  desc = 'Disable autoformat-on-save',
+  bang = true,
+})
+vim.api.nvim_create_user_command('AutoFormatEnable', function(args)
+  -- AutoFormatEnable! will disable formatting just for this buffer
+  if args.bang then
+    vim.b.enable_autoformat = true
+    vim.b.enable_autotrailing = false
+    vim.notify('autoformat-on-save HABILITADO no buffer', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  else
+    vim.b.enable_autoformat = true
+    vim.g.enable_autoformat = true
+    vim.notify('autoformat-on-save HABILITADO globalmente', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  end
+end, {
+  desc = 'Re-enable autoformat-on-save',
+})
+-- habilita o auto format somente para trailing whitespaces
+vim.api.nvim_create_user_command('AutoFormatEnableOnlyTrailing', function(args)
+  if args.bang then
+    vim.b.enable_autotrailing = true
+    vim.notify('autoformat-on-save HABILITADO para TRAILING WHITESPACES no buffer', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  else
+    vim.g.enable_autotrailing = true
+    -- mostra a situação no notify
+    vim.notify('autoformat-on-save HABILITADO para TRAILING WHITESPACES globalmente', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  end
+end, {
+  desc = 'Re-enable autoformat-on-save para traling whitespaces',
+})
