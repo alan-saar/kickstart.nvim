@@ -87,6 +87,9 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- NOTE: desabilita o autoformat por padrão no buffer e globalmente
 vim.g.enable_autoformat = false
 vim.g.enable_autotrailing = true
+-- vim.g.better_whitespace_guicolor = '#1a1b26' -- pode ser usada um cor aqui, como red
+vim.g.better_whitespace_enabled = 0 -- desabilitei porque não gosto do vermelho, prefiro do jeito do kickstart
+vim.g.strip_whitespace_on_save = 1 -- esse aqui só funciona setando na marra, não consegui usando meu comando :AutoFormatEnableTrailing
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -176,8 +179,8 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', '<leader>]d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 
--- Keymaps do NERDTree
-vim.keymap.set('n', '<leader>e', ':NERDTreeToggle<cr>', { desc = 'Go to next [D]iagnostic message' })
+-- Keymaps do NvimTree
+vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<cr>', { desc = '[E]xplore files' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -242,10 +245,23 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  'vimwiki/vimwiki',
   'tpope/vim-vinegar',
-  'scrooloose/nerdtree',
   'rcarriga/nvim-notify',
+  'ntpeters/vim-better-whitespace', -- para remover trailing whitespaces :StripWhitespace
+  -- 'scrooloose/nerdtree',
+  { 'nvim-tree/nvim-tree.lua', opts = {} },
+  {
+    'vimwiki/vimwiki',
+    init = function()
+      vim.g.vimwiki_list = {
+        {
+          path = '~/vimwiki',
+          syntax = 'default',
+          ext = '.wiki',
+        },
+      }
+    end,
+  },
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -1050,7 +1066,7 @@ vim.api.nvim_create_user_command('AutoFormatEnable', function(args)
   -- AutoFormatEnable! will disable formatting just for this buffer
   if args.bang then
     vim.b.enable_autoformat = true
-    vim.b.enable_autotrailing = false
+    vim.b.enable_autotrailing = true
     vim.notify('autoformat-on-save HABILITADO no buffer', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
   else
     vim.b.enable_autoformat = true
@@ -1061,12 +1077,28 @@ end, {
   desc = 'Re-enable autoformat-on-save',
 })
 -- habilita o auto format somente para trailing whitespaces
-vim.api.nvim_create_user_command('AutoFormatEnableOnlyTrailing', function(args)
+vim.api.nvim_create_user_command('AutoFormatEnableTrailing', function(args)
   if args.bang then
     vim.b.enable_autotrailing = true
+    -- vim.b.strip_whitespace_on_save = 1
     vim.notify('autoformat-on-save HABILITADO para TRAILING WHITESPACES no buffer', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
   else
     vim.g.enable_autotrailing = true
+    -- vim.g.strip_whitespace_on_save = 1
+    -- mostra a situação no notify
+    vim.notify('autoformat-on-save HABILITADO para TRAILING WHITESPACES globalmente', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  end
+end, {
+  desc = 'Re-enable autoformat-on-save para traling whitespaces',
+})
+vim.api.nvim_create_user_command('AutoFormatDisableTrailing', function(args)
+  if args.bang then
+    vim.b.enable_autotrailing = false
+    -- vim.b.strip_whitespace_on_save = 0
+    vim.notify('autoformat-on-save HABILITADO para TRAILING WHITESPACES no buffer', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
+  else
+    vim.g.enable_autotrailing = false
+    -- vim.g.strip_whitespace_on_save = 0 -- não funcionou
     -- mostra a situação no notify
     vim.notify('autoformat-on-save HABILITADO para TRAILING WHITESPACES globalmente', 'info', { title = 'AUTO FORMAT (conform.nvim)' })
   end
