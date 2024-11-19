@@ -179,6 +179,21 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', '<leader>]d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 
+-- comandos do vimux
+vim.keymap.set('n', '<leader>vo', ':VimuxOpenRunner<cr>', { desc = '[V]imux [O]pen runner' })
+vim.keymap.set('n', '<leader>vsr', ':VimuxRunCommand("mvn spring-boot:run -Dspring-boot.run.profiles=local")<CR>', { desc = '[V]imux [S]pring [R]run' })
+vim.keymap.set('n', '<leader>vst', ':VimuxRunCommand("mvn test")<CR>', { desc = '[V]imux [S]pring [T]test ' })
+vim.keymap.set('n', '<leader>vp', ':VimuxPromptCommand<CR>', { desc = '[V]imux [P]rompt' })
+vim.keymap.set('n', '<leader>vt', ':VimuxTogglePane<CR>', { desc = '[V]imux [T]oggle pane' })
+vim.keymap.set('n', '<leader>vq', ':VimuxCloseRunner<CR>', { desc = '[V]imux [Q]uit Runner' })
+vim.keymap.set('n', '<leader>vx', ':VimuxInterruptRunner<CR>', { desc = '[V]imux Interrupt Runner' })
+vim.keymap.set('n', '<leader>vc', ':VimuxCloseRunner<CR>', { desc = '[V]imux [C]lose Runner' })
+vim.keymap.set('n', '<leader>vi', ':VimuxInspectRunner<CR>', { desc = '[V]imux [I]inspect Runner (entra no runner)' })
+vim.keymap.set('n', '<leader>vv', ':VimuxInspectRunner<CR>', { desc = '[V]imux [V]ai pro runner' })
+vim.keymap.set('n', '<leader>vl', ':VimuxClearTerminalScreen<cr>', { desc = '[V]imux [L]impar tela' })
+vim.keymap.set('n', '<leader>vz', ':VimuxZoomRunner<cr>', { desc = '[V]imux [Z]oom runner' })
+vim.keymap.set('n', '<leader>vg', ':VimuxPromptCommand("git diff --cached")<cr>', { desc = '[V]imux [G]it diff --cached' })
+
 -- Keymaps do NvimTree
 vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<cr>', { desc = '[E]xplore files' })
 
@@ -249,6 +264,7 @@ require('lazy').setup({
   'tpope/vim-vinegar',
   'rcarriga/nvim-notify',
   'ntpeters/vim-better-whitespace', -- para remover trailing whitespaces :StripWhitespace
+  'preservim/vimux',
   { 'akinsho/toggleterm.nvim', version = '*', config = true },
   -- 'scrooloose/nerdtree',
   { 'nvim-tree/nvim-tree.lua', opts = {} },
