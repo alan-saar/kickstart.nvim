@@ -1,0 +1,13 @@
+Esses são os plugins LSP instalados com o Mason a la carte
+:MasonInstall ...
+
+    ◍ angular-language-server angularls
+    ◍ jdtls
+    ◍ jedi-language-server jedi_language_server
+    ◍ kotlin-language-server kotlin_language_server
+    ◍ lua-language-server lua_ls
+    ◍ pyright
+    ◍ ruff
+    ◍ rust-analyzer rust_analyzer
+    ◍ spring-boot-tools
+    ◍ typescript-language-server
