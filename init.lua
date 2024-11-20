@@ -737,6 +737,11 @@ require('lazy').setup({
               -- Your custom nvim-java configuration goes here
             }
           end,
+          kotlin_language_server = function()
+            require('lspconfig').kotlin_language_server.setup {
+              settings = { kotlin = { compiler = { jvm = { target = '17' } } } },
+            }
+          end,
         },
       }
     end,
