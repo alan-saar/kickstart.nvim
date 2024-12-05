@@ -197,6 +197,14 @@ vim.keymap.set('n', '<leader>vg', ':VimuxPromptCommand("git diff --cached")<cr>'
 -- Keymaps do NvimTree
 vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<cr>', { desc = '[E]xplore files' })
 
+-- Keymaps do vim-test
+vim.keymap.set('n', '<leader>tc', ':TestClass<cr>', { desc = '[T]est [C]lass' })
+vim.keymap.set('n', '<leader>tn', ':TestNearest<cr>', { desc = '[T]est [N]earest' })
+vim.keymap.set('n', '<leader>tf', ':TestFile<cr>', { desc = '[T]est [F]ile' })
+vim.keymap.set('n', '<leader>ts', ':TestSuite<cr>', { desc = '[T]est [S]uite' })
+vim.keymap.set('n', '<leader>tl', ':TestLast<cr>', { desc = '[T]est [L]ast' })
+vim.keymap.set('n', '<leader>tv', ':TestVisit<cr>', { desc = '[T]est [V]isit' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -646,13 +654,13 @@ require('lazy').setup({
       })
 
       -- Change diagnostic symbols in the sign column (gutter)
-      -- if vim.g.have_nerd_font then
-      --   local signs = { Error = '', Warn = '', Hint = '', Info = '' }
-      --   for type, icon in pairs(signs) do
-      --     local hl = 'DiagnosticSign' .. type
-      --     vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-      --   end
-      -- end
+      if vim.g.have_nerd_font then
+        local signs = { Error = '', Warn = '', Hint = '', Info = '' }
+        for type, icon in pairs(signs) do
+          local hl = 'DiagnosticSign' .. type
+          vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+        end
+      end
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
